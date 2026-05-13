@@ -276,7 +276,7 @@ async function fetchRecords(){
     let all=[], offset=null;
     do {
       const url = API+(offset?`?offset=${offset}`:'');
-      const r = await fetch(url);
+      const r = await fetch(url, {headers: {'Authorization': 'Bearer patrN55dtE2LSt0m5.6deb250035859a3ddb12348a8a38f0cc56d3a15646dd6d9cccafebdc9c9b0ff4'}});
       if(!r.ok) throw new Error(r.status);
       const d = await r.json();
       all = all.concat(d.records||[]);
@@ -381,10 +381,10 @@ async function saveEntry(){
   try {
     setSyncState('syncing');
     if(editId){
-      await fetch(`${API}?id=${editId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});
+      await fetch(`${API}?id=${editId}`,{method:'PATCH',headers:{'Authorization':'Bearer patrN55dtE2LSt0m5.6deb250035859a3ddb12348a8a38f0cc56d3a15646dd6d9cccafebdc9c9b0ff4','Content-Type':'application/json'},body:JSON.stringify({fields})});
       showToast('Projet mis à jour ✓');
     } else {
-      await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields})});
+      await fetch(API,{method:'POST',headers:{'Authorization':'Bearer patrN55dtE2LSt0m5.6deb250035859a3ddb12348a8a38f0cc56d3a15646dd6d9cccafebdc9c9b0ff4','Content-Type':'application/json'},body:JSON.stringify({fields})});
       showToast('Projet créé ✓');
     }
     closeModal();
@@ -400,7 +400,7 @@ async function deleteEntry(id){
   if(!confirm('Supprimer ce projet définitivement ?')) return;
   setSyncState('syncing');
   try {
-    await fetch(`${API}?id=${id}`,{method:'DELETE'});
+    await fetch(`${API}?id=${id}`,{method:'DELETE',headers:{'Authorization':'Bearer patrN55dtE2LSt0m5.6deb250035859a3ddb12348a8a38f0cc56d3a15646dd6d9cccafebdc9c9b0ff4'}});
     showToast('Projet supprimé');
     await fetchRecords();
   } catch(e){
@@ -415,15 +415,3 @@ setInterval(fetchRecords, 30000);
 </script>
 </body>
 </html>
-<script>
-// Patch: add auth headers to all fetch calls
-const _origFetch = window.fetch;
-window.fetch = function(url, opts={}) {
-  if(typeof url === 'string' && url.includes('airtable.com')) {
-    opts.headers = Object.assign({}, opts.headers, {
-      'Authorization': 'Bearer patrN55dtE2LSt0m5.6deb250035859a3ddb12348a8a38f0cc56d3a15646dd6d9cccafebdc9c9b0ff4'
-    });
-  }
-  return _origFetch(url, opts);
-};
-</script>
